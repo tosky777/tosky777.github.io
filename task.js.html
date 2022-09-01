@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: task.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: task.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @typedef { Object } CreateTodoPayload
+ * @property { string } desc - Description
+ * @property { string } category - Category
+ * @property { string } [tags] - Tags
+ */
+
+/**
+ * @typedef { Object } UpdateTodoPayload
+ * @property { string= } desc - Description
+ * @property { string= } category - Category
+ * @property { string[] } [tags] - Tags
+ */
+
+
+/**
+ * Represent a App.
+ * @class
+ */
+class App {
+  constructor() {
+    /** @private */
+    this.storage = new TodoStorage();
+  }
+
+  /**
+   * Request to Create a new todo instance.
+   * @param { CreateTodoPayload } payload
+   */
+  create(payload) {
+    this.storage.create(payload);
+  }
+
+  /**
+   * Request to retrieve todo instances.
+   * @param { number= } id
+   * @returns { Todo[] | Todo | undefined }
+   */
+  read(id) {
+    return id ? this.storage.readById(id) : this.storage.readAll();
+  }
+
+  /**
+   * Request to update by id.
+   * @param { number } id
+   * @param { UpdateTodoPayload } payload
+   */
+  update(id, payload) {
+    this.storage.update(id, payload);
+  }
+
+  /**
+   * Request to delete todo instances by id or all.
+   * @param { number= } id
+   */
+  delete(id) {
+    id ? this.storage.deleteById(id) : this.storage.deleteAll();
+  }
+}
+
+/**
+ * Represent a TodoStorage.
+ * @class
+ */
+class TodoStorage {
+  constructor() {
+    /** @private */
+    this.storage = {};
+  }
+
+  /**
+   * Create a new todo instance.
+   * @param { CreateTodoPayload } payload
+   */
+  create(payLoad) {
+    const id = Object.keys(this.storage).length + 1;
+    this.storage[id] = new Todo(id, false, payLoad);
+  }
+
+  /**
+   * Retrieve a todo instance by id.
+   * @param { number } id
+   * @returns { Todo | undefined }
+   */
+  readById(id) {
+    return this.storage[id];
+  }
+
+  /**
+   * Retrieve all todo instances.
+   * @returns { Todo[] }
+   */
+  readAll() {
+    return Object.values(this.storage);
+  }
+
+  /**
+   * Update a todo by id.
+   * @param { number } id
+   * @param { UpdateTodoPayload } payload
+   */
+  update(id, payload) {
+    const todo = this.readById(id);
+    if (!todo)
+      return;
+    if (payload.desc)
+      todo.desc = payload.desc;
+    if (payload.tags)
+      todo.tags = payload.tags;
+    if (payload.category)
+      todo.category = payload.category;
+    this.storage[id] = todo;
+  }
+
+  /**
+   * Delete a todo by id.
+   * @param { number } id
+   */
+  deleteById(id) {
+    delete this.storage[id];
+  }
+
+  /**
+   * Delete all todo instances.
+   */
+  deleteAll() {
+    this.storage = {};
+  }
+
+  /**
+   * Delete a specific tag in a todo instance by id.
+   * @param { number } id
+   * @param { string } tag
+   */
+  deleteTagById(id, tag) {
+    this.storage[id]?.getTags().delete(tag);
+  }
+
+  /**
+   * Delete all tags in a todo instance by id.
+   * @param { number } id
+   */
+  flushTagById(id) {
+    this.storage[id]?.getTags().clear();
+  }
+}
+
+/**
+ * Represent a Todo.
+ * @class
+ */
+class Todo {
+  constructor(id, isDone, payload) {
+    /** @private */
+    this._id = id;
+    /** @private */
+    this._desc = payload.desc;
+    /** @private */
+    this._isDone = isDone;
+    /** @private */
+    this._category = payload.category;
+    /** @private */
+    this._tags = payload.tags ? new Set(payload.tags) : new Set();
+  }
+
+  /**
+   * Getter for the id
+   * @type { number }
+   */
+  get id() {
+    return this._id;
+  }
+
+  /**
+   * Getter for the description
+   * @type { string }
+   */
+  get desc() {
+    return this._desc;
+  }
+
+  /**
+   * Getter for isDone
+   * @type { boolean }
+   */
+  get isDone() {
+    return this._isDone;
+  }
+
+  /**
+   * Getter for the category
+   * @type { string }
+   */
+  get category() {
+    return this._category;
+  }
+
+  /**
+   * getter for the tags
+   * @type { Set&lt;string> }
+   */
+  getTags() {
+    return this._tags;
+  }
+
+  set desc(value) {
+    this._desc = value;
+  }
+
+  set isDone(value) {
+    this._isDone = value;
+  }
+
+  set category(value) {
+    this._category = value;
+  }
+
+  set tags(values) {
+    this._tags = new Set(values);
+  }
+}
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="App.html">App</a></li><li><a href="Todo.html">Todo</a></li><li><a href="TodoStorage.html">TodoStorage</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Thu Sep 01 2022 15:37:06 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
